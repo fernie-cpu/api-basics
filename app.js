@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 require('dotenv').config();
@@ -40,6 +41,18 @@ app.get('/users/:userid', (req, res) => {
 
 app.get('/messages', (req, res) => {
   return res.send(Object.values(messages));
+});
+
+app.post('/messages', (req, res) => {
+  const id = uuidv4();
+  const message = {
+    id,
+    text: req.body.text,
+  };
+
+  messages[id] = message;
+
+  return res.send(message);
 });
 
 app.get('/messages/:messageid', (req, res) => {
