@@ -56,6 +56,8 @@ app.post('/messages', (req, res) => {
   const message = {
     id,
     text: req.body.text,
+    // get the authenticated user from the request object and append it as message creator to the message
+    userid: req.me.id,
   };
 
   messages[id] = message;
