@@ -9,6 +9,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// the user with the identifier 1 which gets assigned as me property to the request object
+app.use((req, res, next) => {
+  req.me = users[1];
+  next();
+});
+
 let users = {
   1: {
     id: '1',
