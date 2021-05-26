@@ -5,58 +5,39 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 require('dotenv').config();
 
+const models = require('./models');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // the user with the identifier 1 which gets assigned as me property to the request object
 app.use((req, res, next) => {
-  req.me = users[1];
+  req.context = {
+    models,
+    me: models.users[1],
+  };
   next();
 });
 
-let users = {
-  1: {
-    id: '1',
-    username: 'Robin Wieruch',
-  },
-  2: {
-    id: '2',
-    username: 'Dave Davids',
-  },
-};
-
-let messages = {
-  1: {
-    id: '1',
-    text: 'Hello World',
-    userid: '1',
-  },
-  2: {
-    id: '2',
-    text: 'By World',
-    userid: '2',
-  },
-};
-
 app.get('/session', (req, res) => {
-  return res.send(users[req.me.id]);
+  return res.send(req.context.models.users[req.context.me.id]);
 });
 
 app.get('/users', (req, res) => {
-  return res.send(Object.values(users));
+  return res.send(Object.values(req.context.models.users));
 });
 
 app.get('/users/:userid', (req, res) => {
-  return res.send(users[req.params.userid]);
+  return res.send(req.context.models.users[req.params.userid]);
 });
 
 app.get('/messages', (req, res) => {
-  return res.send(Object.values(messages));
+  return res.send(Object.values(req.context.models.messages));
 });
 
 app.get('/messages/:messageid', (req, res) => {
-  return res.send(messages[req.params.messageid]);
+  return res.send(req.context.models.messages[req.params.messageid]);
 });
 
 app.post('/messages', (req, res) => {
@@ -65,18 +46,19 @@ app.post('/messages', (req, res) => {
     id,
     text: req.body.text,
     // get the authenticated user from the request object and append it as message creator to the message
-    userid: req.me.id,
+    userid: req.context.me.id,
   };
 
-  messages[id] = message;
+  req.context.models.messages[id] = message;
 
   return res.send(message);
 });
 
 app.delete('/messages/:messageid', (req, res) => {
-  const { [req.params.messageid]: message, ...otherMessages } = messages;
+  const { [req.params.messageid]: message, ...otherMessages } =
+    req.context.models.messages;
 
-  messages = otherMessages;
+  req.context.models.messages = otherMessages;
 
   return res.send(message);
 });
