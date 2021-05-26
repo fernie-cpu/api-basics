@@ -1,28 +1,15 @@
+require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 
 const app = express();
-require('dotenv').config();
+require('./passport');
 
-const models = require('./models');
-const routes = require('./routes');
+const auth = require('./routes/auth');
 
-app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/session', routes.session);
-app.use('/users', routes.user);
-app.use('/messages', routes.message);
-
-// the user with the identifier 1 which gets assigned as me property to the request object
-app.use((req, res, next) => {
-  req.context = {
-    models,
-    me: models.users[1],
-  };
-  next();
-});
+app.use('/auth', auth);
 
 app.listen(process.env.PORT, () => {
   console.log(`listening on port ${process.env.PORT}`);
