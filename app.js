@@ -1,8 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
+
+const mongoose = require('mongoose');
+const mongoDb = process.env.MONGODB;
+mongoose.connect(mongoDb, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'mongo connection error'));
 
 const app = express();
-require('dotenv').config();
 
 const models = require('./models');
 const routes = require('./routes');
