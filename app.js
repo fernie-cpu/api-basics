@@ -39,6 +39,10 @@ let messages = {
   },
 };
 
+app.get('/session', (req, res) => {
+  return res.send(users[req.me.id]);
+});
+
 app.get('/users', (req, res) => {
   return res.send(Object.values(users));
 });
@@ -49,6 +53,10 @@ app.get('/users/:userid', (req, res) => {
 
 app.get('/messages', (req, res) => {
   return res.send(Object.values(messages));
+});
+
+app.get('/messages/:messageid', (req, res) => {
+  return res.send(messages[req.params.messageid]);
 });
 
 app.post('/messages', (req, res) => {
@@ -65,20 +73,12 @@ app.post('/messages', (req, res) => {
   return res.send(message);
 });
 
-app.get('/messages/:messageid', (req, res) => {
-  return res.send(messages[req.params.messageid]);
-});
+app.delete('/messages/:messageid', (req, res) => {
+  const { [req.params.messageid]: message, ...otherMessages } = messages;
 
-app.post('/users', (req, res) => {
-  return res.send('POST HTTP method on user resource');
-});
+  messages = otherMessages;
 
-app.put('/users/:userid', (req, res) => {
-  return res.send(`PUT HTTP method on user/${req.params.userid} resource`);
-});
-
-app.delete('/users/:userid', (req, res) => {
-  return res.send(`DELETE HTTP method on user/${req.params.userid} resource`);
+  return res.send(message);
 });
 
 app.listen(process.env.PORT, () => {
